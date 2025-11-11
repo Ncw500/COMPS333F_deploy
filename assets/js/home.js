@@ -61,7 +61,19 @@
   }
 
   /**
+   * 功能：根據目前頁面動態解析 lectures.json 的相對路徑
+   * 說明：相容 /deployed/index.html 與 /deployed/ 兩種 URL 形式
+   * @returns {string} - 可用的 JSON 路徑
+   */
+  function resolveLecturesJsonUrl() {
+    const path = window.location.pathname;
+    const base = path.endsWith('/') ? path : path.replace(/[^/]+$/, '');
+    return base + 'lectures.json';
+  }
+
+  /**
    * 功能：首頁初始化（主題與返回頂部由框架處理）
+   * 說明：載入 lectures.json、渲染卡片並綁定搜尋
    */
   async function initHome() {
     UI.initTheme();
@@ -69,8 +81,8 @@
     const container = document.getElementById('lecture-list');
     const search = document.getElementById('search');
     try {
-      // 改為相對路徑，兼容 GitHub Pages 專案頁面
-      const items = await fetchLectures('lectures.json');
+      const jsonUrl = resolveLecturesJsonUrl();
+      const items = await fetchLectures(jsonUrl);
       renderLectures(items, container);
       if (search) attachSearch(items, search, container);
     } catch (e) {
