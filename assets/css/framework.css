@@ -37,6 +37,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+body { margin: 0; }
 * { box-sizing: border-box; }
 a { color: var(--link); text-decoration: none; }
 a:hover { color: var(--link-hover); text-decoration: underline; }
@@ -58,6 +59,9 @@ header.site-header { position: sticky; top: 0; z-index: 30; background: var(--bg
 .controls { display: flex; gap: .5rem; }
 button.icon-btn { display: inline-flex; align-items: center; gap: .5rem; border: 1px solid var(--border); background: var(--bg); color: var(--fg); padding: .375rem .625rem; border-radius: 6px; cursor: pointer; }
 button.icon-btn:hover { border-color: var(--link); }
+/* 讓錨點也可用 icon-btn 風格（移動端返回首頁） */
+a.icon-btn { display: inline-flex; align-items: center; gap: .5rem; border: 1px solid var(--border); background: var(--bg); color: var(--fg); padding: .375rem .625rem; border-radius: 6px; }
+a.icon-btn:hover { border-color: var(--link); text-decoration: none; }
 /* 通用按鈕（首頁） */
 .btn { display:inline-flex; align-items:center; border:1px solid var(--border); background:var(--bg); color:var(--fg); padding:.375rem .625rem; border-radius:6px; cursor:pointer; }
 .btn:hover { border-color: var(--link); }
@@ -119,4 +123,14 @@ article#content hr { border: none; border-top: 1px solid var(--border); margin: 
   .hero { grid-template-columns: 1fr; }
   nav#toc { right: 0; width: min(90vw, 360px); top: 64px; }
   .card-grid, .card-list { grid-template-columns: 1fr; }
+}
+
+/* 更小裝置優化 */
+@media (max-width: 640px) {
+  .header-inner { padding: .5rem .75rem; }
+  .container { padding: .75rem; }
+  .hero { padding: .75rem; }
+}
+@media (max-width: 400px) {
+  .container { padding: .5rem; }
 }
