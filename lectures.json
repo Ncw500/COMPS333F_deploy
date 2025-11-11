@@ -3,7 +3,7 @@
     "id": "lecture02",
     "title": "Lecture 02 — 智能代理與理性行為",
     "description": "重構教學版面，含目錄、圖表、表格、代碼與公式展示。",
-    "path": "/deployed/lecture02.html",
+    "path": "lecture02.html",
     "tags": ["Agent", "Rational", "PEAS", "AI"],
     "updated": "2025-11-11"
   }

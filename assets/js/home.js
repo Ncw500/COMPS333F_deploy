@@ -69,7 +69,8 @@
     const container = document.getElementById('lecture-list');
     const search = document.getElementById('search');
     try {
-      const items = await fetchLectures('/deployed/lectures.json');
+      // 改為相對路徑，兼容 GitHub Pages 專案頁面
+      const items = await fetchLectures('lectures.json');
       renderLectures(items, container);
       if (search) attachSearch(items, search, container);
     } catch (e) {
