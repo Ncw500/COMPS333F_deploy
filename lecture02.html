@@ -2,20 +2,23 @@
 <html lang="zh-HK" data-theme="auto">
 <head>
   <meta charset="utf-8" />
-  <title>COMPS333F Lecture 02 - Agent</title>
+  <title>COMPS333F Lecture 02 - 優化展示頁面</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="description" content="COMPS333F Lecture 02 筆記：Agent、Rational Agents、PEAS、Environment Types、Types of Agents。" />
+  <meta name="description" content="優化展示 COMPS333F Lecture 02 Markdown 內容的現代化網頁，含目錄、交互、可訪問性與性能優化。" />
   <meta name="author" content="HKMU COMPS333F" />
   <meta name="color-scheme" content="light dark" />
   <meta name="theme-color" content="#0d6efd" />
   <link rel="icon" href="data:,">
-  <!-- 語法高亮樣式（使用 highlight.js 的 GitHub 風格） -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
-  <!-- 預先提示瀏覽器可能需要載入的 Markdown（在 http 伺服器下效果更佳） -->
-  <link rel="preload" href="lecture02.md" as="fetch" crossorigin="anonymous">
+  <!-- 性能優化：預連線 CDN -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="/deployed/assets/css/framework.css" />
+
+  <!-- 語法高亮樣式（highlight.js） -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 
   <style>
-    /* 基礎排版與主題變數 */
+    /* 主題變數（淺色/深色） */
     :root {
       --bg: #ffffff;
       --fg: #1f2328;
@@ -24,7 +27,7 @@
       --link-hover: #084298;
       --border: #d0d7de;
       --code-bg: #f6f8fa;
-      --toc-bg: #f8f9fa;
+      --panel-bg: #f8f9fa;
       --accent: #0d6efd;
       --shadow: 0 2px 10px rgba(0,0,0,0.06);
     }
@@ -36,10 +39,11 @@
       --link-hover: #1f6feb;
       --border: #30363d;
       --code-bg: #161b22;
-      --toc-bg: #0f1115;
+      --panel-bg: #0f1115;
       --accent: #58a6ff;
       --shadow: 0 2px 12px rgba(0,0,0,0.35);
     }
+
     html, body {
       height: 100%;
       background: var(--bg);
@@ -49,379 +53,297 @@
       text-rendering: optimizeLegibility;
     }
     * { box-sizing: border-box; }
-    a {
-      color: var(--link);
-      text-decoration: none;
-    }
-    a:hover {
-      color: var(--link-hover);
-      text-decoration: underline;
-    }
-    code, pre, kbd, samp {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    }
-    pre {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem;
-      overflow: auto;
-    }
-    pre code {
-      background: transparent;
-      padding: 0;
-    }
-    img, svg, video, canvas {
-      max-width: 100%;
-      height: auto;
-      display: block;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1rem 0;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    th, td {
-      padding: .625rem .75rem;
-      border-bottom: 1px solid var(--border);
-    }
-    thead th {
-      background: var(--code-bg);
-      text-align: left;
-    }
+    a { color: var(--link); text-decoration: none; }
+    a:hover { color: var(--link-hover); text-decoration: underline; }
+    code, pre, kbd, samp { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow: auto; }
+    pre code { background: transparent; padding: 0; }
+    img, svg, video, canvas { max-width: 100%; height: auto; display: block; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    th, td { padding: .625rem .75rem; border-bottom: 1px solid var(--border); }
+    thead th { background: var(--code-bg); text-align: left; }
 
-    /* 版頭、主內容、側邊目錄 */
-    header.site-header {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      box-shadow: var(--shadow);
-    }
-    .header-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: .75rem 1rem;
-    }
-    .title {
-      font-weight: 700;
-      letter-spacing: .2px;
-    }
-    .controls {
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-    }
-    button.icon-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: .5rem;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--fg);
-      padding: .375rem .625rem;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    button.icon-btn:hover {
-      border-color: var(--link);
-    }
+    /* 版頭導航 */
+    header.site-header { position: sticky; top: 0; z-index: 30; background: var(--bg); border-bottom: 1px solid var(--border); box-shadow: var(--shadow); }
+    .header-inner { max-width: 1200px; margin: 0 auto; padding: .5rem 1rem; display: grid; grid-template-columns: 1fr auto auto; gap: .75rem; align-items: center; }
+    .brand { font-weight: 700; letter-spacing: .2px; }
+    .nav { display: flex; gap: .5rem; }
+    .nav a { padding: .375rem .625rem; border-radius: 6px; }
+    .controls { display: flex; gap: .5rem; }
+    button.icon-btn { display: inline-flex; align-items: center; gap: .5rem; border: 1px solid var(--border); background: var(--bg); color: var(--fg); padding: .375rem .625rem; border-radius: 6px; cursor: pointer; }
+    button.icon-btn:hover { border-color: var(--link); }
 
-    .layout {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 1rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 1rem;
-    }
-    nav#toc {
-      position: sticky;
-      top: 64px;
-      align-self: start;
-      background: var(--toc-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: .75rem;
-      height: max-content;
-      max-height: calc(100vh - 96px);
-      overflow: auto;
-      box-shadow: var(--shadow);
-    }
-    nav#toc h2 {
-      margin: 0 0 .5rem 0;
-      font-size: 1rem;
-    }
-    nav#toc ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-    nav#toc li {
-      margin: .25rem 0;
-    }
-    nav#toc a {
-      display: inline-block;
-      padding: .125rem .25rem;
-      border-radius: 4px;
-    }
-    nav#toc a.current {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-    }
+    /* 主內容容器（單欄全寬） */
+    .container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
 
-    main {
-      min-width: 0;
-    }
-    article#content h1, article#content h2, article#content h3,
-    article#content h4, article#content h5, article#content h6 {
-      scroll-margin-top: 88px;
-    }
-    article#content h1 { font-size: 2rem; margin-top: 0; }
+    /* 英雄橫幅與視覺輔助區塊 */
+    .hero { background: linear-gradient(90deg, rgba(13,110,253,.08), rgba(88,166,255,.08)); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; display: grid; grid-template-columns: 1fr 280px; gap: 1rem; align-items: center; }
+    .hero h1 { margin: 0; font-size: 1.8rem; }
+    .hero p { margin: .25rem 0 0; color: var(--muted-fg); }
+    .hero .visual { border: 1px solid var(--border); border-radius: 10px; background: var(--panel-bg); padding: .5rem; }
+
+    /* 右側覆蓋式目錄面板 */
+    nav#toc { position: fixed; top: 72px; right: 16px; width: 300px; background: var(--panel-bg); border: 1px solid var(--border); border-radius: 10px; padding: .75rem; max-height: calc(100vh - 96px); overflow: auto; box-shadow: var(--shadow); transition: transform .25s ease, opacity .25s ease, visibility .25s ease; transform: translateX(110%); opacity: 0; visibility: hidden; pointer-events: none; z-index: 25; }
+    nav#toc.is-open { transform: translateX(0); opacity: 1; visibility: visible; pointer-events: auto; }
+    nav#toc h2 { margin: 0 0 .5rem 0; font-size: 1rem; }
+    nav#toc ul { list-style: none; margin: 0; padding: 0; }
+    nav#toc li { margin: .25rem 0; }
+    nav#toc a { display: inline-block; padding: .125rem .25rem; border-radius: 4px; }
+    nav#toc a.current { background: var(--code-bg); border: 1px solid var(--border); }
+
+    /* 內容區標題與分隔 */
+    article#content h1, article#content h2, article#content h3, article#content h4, article#content h5, article#content h6 { scroll-margin-top: 88px; }
+    article#content h1 { font-size: 2rem; margin-top: 1rem; }
     article#content h2 { font-size: 1.6rem; margin-top: 2rem; }
     article#content h3 { font-size: 1.3rem; margin-top: 1.5rem; }
-    article#content hr {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 1.5rem 0;
-    }
-
-    /* 章節錨點鏈接圖示 */
-    .anchor-link {
-      margin-left: .5rem;
-      opacity: .6;
-      text-decoration: none;
-      font-size: .9em;
-    }
+    article#content hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+    .anchor-link { margin-left: .5rem; opacity: .6; text-decoration: none; font-size: .9em; }
     .anchor-link:hover { opacity: 1; }
 
     /* 返回頂部按鈕 */
-    #back-to-top {
-      position: fixed;
-      right: 1rem;
-      bottom: 1rem;
-      z-index: 30;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity .2s ease, visibility .2s ease, transform .2s ease;
-      transform: translateY(8px);
-    }
-    #back-to-top.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
+    #back-to-top { position: fixed; right: 1rem; bottom: 1rem; z-index: 40; opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility .2s ease, transform .2s ease; transform: translateY(8px); }
+    #back-to-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
 
     /* 行動端優化 */
     @media (max-width: 960px) {
-      .layout { grid-template-columns: 1fr; }
-      nav#toc { position: relative; top: 0; max-height: none; }
+      .header-inner { grid-template-columns: 1fr auto; }
+      .nav { display: none; }
+      .hero { grid-template-columns: 1fr; }
+      nav#toc { right: 0; width: min(90vw, 360px); top: 64px; }
     }
   </style>
 
   <!-- MathJax：渲染 $...$ 與 $$...$$ 的 LaTeX 公式 -->
   <script>
     window.MathJax = {
-      tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$','$$'], ['\\[','\\]']]
-      },
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
       options: { renderActions: { addMenu: [] } }
     };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-  <!-- marked.js：Markdown 解析 -->
-  <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
-  <!-- highlight.js：語法高亮 -->
-  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/dist/highlight.min.js"></script>
+  <!-- highlight.js：語法高亮（defer） -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
 <body>
   <a href="#content" class="visually-hidden" aria-label="跳至主內容">跳至主內容</a>
 
   <header class="site-header" role="banner" aria-label="頁首">
     <div class="header-inner">
-      <div class="title">COMPS333F Lecture 02 — Agent</div>
+      <div class="brand" role="heading" aria-level="1">COMPS333F — Lecture 02</div>
+      <nav class="nav" role="navigation" aria-label="主選單">
+        <a href="/deployed/index.html" aria-label="前往首頁">首頁</a>
+        <a href="#content" aria-label="跳至筆記">筆記</a>
+      </nav>
       <div class="controls">
-        <button id="toc-toggle" class="icon-btn" type="button" role="button" aria-controls="toc" aria-expanded="true" aria-label="切換目錄顯示">
-          🧭 目錄
-        </button>
-        <button id="theme-toggle" class="icon-btn" type="button" role="button" aria-pressed="false" aria-label="切換深色/淺色模式">
-          🌗 主題
-        </button>
+        <button id="toc-toggle" class="icon-btn" type="button" role="button" aria-controls="toc" aria-expanded="false" aria-label="切換目錄顯示">🧭 目錄</button>
+        <button id="theme-toggle" class="icon-btn" type="button" role="button" aria-pressed="false" aria-label="切換深色/淺色模式">🌗 主題</button>
       </div>
     </div>
   </header>
 
-  <div class="layout">
-    <nav id="toc" role="navigation" aria-label="目錄">
-      <h2>目錄</h2>
-      <ul id="toc-list"></ul>
-    </nav>
+  <div class="container">
 
     <main role="main" aria-label="主內容">
-      <article id="content" aria-label="筆記內容"></article>
+      <article id="content" aria-label="筆記內容">
+        <h1>智能代理（Agent）與理性行為導讀</h1>
+        <p>這是一份為 COMPS333F Lecture 02 重新編排的教學頁面。我將原始 Markdown 的重點，重新組織為段落、圖示、流程與範例，方便快速理解與考試複習。</p>
+
+        <hr>
+
+        <h2>一、什麼是「代理」（Agent）？</h2>
+        <p>代理是一個能夠<strong>透過感知器（Sensors）</strong>理解環境、並用<strong>效器（Actuators）</strong>對環境採取行動的實體。</p>
+        <div class="hero" aria-label="Agent 概念示意圖">
+          <div>
+            <ul>
+              <li>人類代理：感知器如眼、耳；效器如手、腳、口。</li>
+              <li>機械代理：感知器如相機、麥克風、紅外線；效器如夾具、馬達、推進系統。</li>
+            </ul>
+            <p>代理在每個時刻會接收一個 <em>percept</em>；所有時刻的感知序列稱為 <em>percept sequence</em>。</p>
+          </div>
+          <div class="visual" aria-label="Agent-Sensors-Actuators 示意 SVG">
+            <img loading="lazy" alt="代理感知與行動示意圖" src="data:image/svg+xml;utf8,
+              <svg xmlns='http://www.w3.org/2000/svg' width='360' height='200' viewBox='0 0 360 200'>
+                <rect x='0' y='0' width='360' height='200' fill='white' stroke='%2330363d'/>
+                <text x='20' y='30' font-size='14' fill='%231f2328'>Agent</text>
+                <circle cx='60' cy='60' r='18' fill='%230d6efd' opacity='.15' stroke='%230d6efd'/>
+                <text x='50' y='65' font-size='12' fill='%230d6efd'>A</text>
+                <text x='120' y='30' font-size='14' fill='%231f2328'>Environment</text>
+                <rect x='120' y='40' width='200' height='120' fill='none' stroke='%230d6efd' opacity='.6'/>
+                <text x='130' y='60' font-size='12' fill='%230d6efd'>Sensors</text>
+                <text x='130' y='80' font-size='12' fill='%230d6efd'>Actuators</text>
+                <path d='M78 60 H115' stroke='%230d6efd' marker-end='url(%23arrow)'/>
+                <path d='M115 120 H78' stroke='%230d6efd' marker-end='url(%23arrow)'/>
+                <defs>
+                  <marker id='arrow' viewBox='0 0 10 10' refX='6' refY='5' markerUnits='strokeWidth' markerWidth='8' markerHeight='8' orient='auto'>
+                    <path d='M 0 0 L 10 5 L 0 10 z' fill='%230d6efd'/>
+                  </marker>
+                </defs>
+              </svg>" />
+          </div>
+        </div>
+
+        <h3>Agent Function 與 Agent Program</h3>
+        <p>代理行為由 <strong>agent function</strong> 決定，它將「感知序列」映射到「動作」。用數學表示：</p>
+        <p>$$f: P^* \to A$$</p>
+        <p>其中 <code>P^*</code> 是所有可能的感知序列集合，<code>A</code> 是動作集合。<strong>agent program</strong> 在具體的系統架構上運行以實現此函數。</p>
+
+        <hr>
+
+        <h2>二、理性代理（Rational Agent）</h2>
+        <ul>
+          <li>理性代理會選擇可以<strong>最大化期望效用</strong>的行動。</li>
+          <li>理性 ≠ 全知：現實中全知不可行，理性是基於可獲得資訊做出最佳判斷。</li>
+          <li>自主演化：代理可透過探索與學習改善未來的感知與行為。</li>
+        </ul>
+        <h3>如何衡量「好」的行為？（性能指標）</h3>
+        <p>性能指標應對應<strong>真實環境中的預期目標</strong>。以「吸塵器代理」為例：</p>
+        <table aria-label="性能指標示例">
+          <thead><tr><th>指標</th><th>說明</th></tr></thead>
+          <tbody>
+            <tr><td>清潔量</td><td>吸走的灰塵量越多越好</td></tr>
+            <tr><td>時間</td><td>完成清潔所需時間越短越好</td></tr>
+            <tr><td>電力</td><td>耗電越少越好</td></tr>
+            <tr><td>噪音</td><td>噪音越小越好</td></tr>
+          </tbody>
+        </table>
+
+        <hr>
+
+        <h2>三、PEAS 框架（設計第一步）</h2>
+        <p>設計任何代理，先清楚列出 <strong>PEAS</strong>：</p>
+        <ul>
+          <li><strong>Performance</strong>（性能指標）：希望代理達成的可衡量目標。</li>
+          <li><strong>Environment</strong>（環境）：代理運作的場域與特性。</li>
+          <li><strong>Actuators</strong>（效器）：代理可用以作用環境的部件。</li>
+          <li><strong>Sensors</strong>（感知器）：代理用以感知環境的部件。</li>
+        </ul>
+
+        <h3>範例：吸塵器代理的 PEAS</h3>
+        <table aria-label="吸塵器代理 PEAS">
+          <thead><tr><th>要素</th><th>描述</th></tr></thead>
+          <tbody>
+            <tr><td>Performance</td><td>高清潔度、低耗電、短時間、低噪音</td></tr>
+            <tr><td>Environment</td><td>室內地面（障礙物、房間布局）</td></tr>
+            <tr><td>Actuators</td><td>吸頭、輪子、導航馬達</td></tr>
+            <tr><td>Sensors</td><td>灰塵感測、相機/雷射、碰撞感測器</td></tr>
+          </tbody>
+        </table>
+
+        <hr>
+
+        <h2>四、環境類型總覽</h2>
+        <p>不同環境性質會影響代理設計方法：</p>
+        <ul>
+          <li><strong>可觀測性</strong>：完全可觀測 vs 部分可觀測</li>
+          <li><strong>不確定性</strong>：確定性 vs 非確定性 vs 策略性</li>
+          <li><strong>動態性</strong>：靜態 vs 半動態 vs 動態</li>
+          <li><strong>代理數量</strong>：單代理 vs 多代理</li>
+          <li><strong>任務結構</strong>：片段式 vs 序列式</li>
+          <li><strong>狀態空間</strong>：離散 vs 連續</li>
+        </ul>
+
+        <h3>快速對照表</h3>
+        <table aria-label="環境類型對照表">
+          <thead><tr><th>維度</th><th>類型</th><th>設計重點</th></tr></thead>
+          <tbody>
+            <tr><td>可觀測性</td><td>完全 / 部分</td><td>是否需要內部狀態與推理模型</td></tr>
+            <tr><td>不確定性</td><td>確定 / 非確定 / 策略</td><td>是否需機率推理或博弈策略</td></tr>
+            <tr><td>動態性</td><td>靜態 / 半動態 / 動態</td><td>是否需即時更新與時間敏感</td></tr>
+            <tr><td>代理數量</td><td>單 / 多</td><td>是否需協調或對抗策略</td></tr>
+            <tr><td>任務結構</td><td>片段 / 序列</td><td>是否需規劃與長期影響分析</td></tr>
+            <tr><td>狀態空間</td><td>離散 / 連續</td><td>資料結構與演算法選擇</td></tr>
+          </tbody>
+        </table>
+
+        <hr>
+
+        <h2>五、代理的四類設計模型</h2>
+        <p>為了在實務中達成理性行為，我們使用更可行的四種代理模型：</p>
+
+        <h3>1）簡單反射式（Simple Reflex Agent）</h3>
+        <p>只依賴「當下感知」選擇動作，不記憶過去、不推理未來；適合<strong>完全可觀測、靜態</strong>環境。</p>
+        <pre><code class="language-python"># 規則：條件 ➜ 動作
+rules = [
+  (lambda percept: percept == 'DIRTY', lambda: 'SUCK'),
+  (lambda percept: percept == 'LEFT',  lambda: 'MOVE_LEFT'),
+  (lambda percept: percept == 'RIGHT', lambda: 'MOVE_RIGHT')
+]
+
+def simple_reflex_agent(percept):
+    for cond, act in rules:
+        if cond(percept):
+            return act()
+    return 'NO_OP'  # 沒有匹配的規則
+</code></pre>
+
+        <h3>2）模型化反射式（Model-based Reflex Agent）</h3>
+        <p>維持<strong>內部狀態</strong>與<strong>世界模型</strong>，依據歷史感知推斷不可見部分，適合<strong>部分可觀測</strong>情境。</p>
+        <pre><code class="language-python">state = {}
+
+def update_state(prev_state, prev_action, percept, model):
+    # 根據模型推進世界狀態（示意）
+    new_state = {**prev_state}
+    new_state['last'] = percept
+    return new_state
+
+def model_reflex_agent(percept):
+    global state
+    state = update_state(state, None, percept, model=None)
+    action = match_rules(state)
+    return action
+</code></pre>
+
+        <h3>3）目標導向型（Goal-based Agent）</h3>
+        <p>除了知道「現在的世界如何」，也知道「希望世界變成什麼樣」。會使用<strong>搜尋/規劃</strong>選擇能達成目標的行動。</p>
+        <pre><code class="language-python">def plan_to_goal(state, goal):
+    # 搜尋與規劃（示意）
+    return ['MOVE_RIGHT', 'SUCK']
+
+def goal_agent(state, goal):
+    plan = plan_to_goal(state, goal)
+    return plan[0] if plan else 'NO_OP'
+</code></pre>
+
+        <h3>4）效用最大化型（Utility-based Agent）</h3>
+        <p>不只達成目標，還要在多種可能狀態間選擇<strong>期望效用最大</strong>的行動。</p>
+        <pre><code class="language-python">def utility(state):
+    # 根據預測狀態計算滿意度（示意）
+    return - state.get('cost', 0) + state.get('cleanliness', 0)
+
+def choose_action(actions, predict):
+    # 選擇期望效用最高的行動
+    scored = [(a, utility(predict(a))) for a in actions]
+    return max(scored, key=lambda x: x[1])[0]
+</code></pre>
+
+        <hr>
+
+        <h2>六、設計指導與備忘單（Cheat Sheet）</h2>
+        <ul>
+          <li>先寫出 <strong>PEAS</strong>，再決定代理模型。</li>
+          <li>部分可觀測 → 加內部狀態與模型；非確定性 → 加機率推理。</li>
+          <li>序列式任務 → 需規劃（搜索、A*、DP）；多代理 → 協作或對抗策略。</li>
+          <li>效用函數可幫助在多目標下做權衡（時間/準確度/成本）。</li>
+        </ul>
+      </article>
     </main>
   </div>
 
+  <nav id="toc" role="navigation" aria-label="目錄">
+    <h2>目錄</h2>
+    <ul id="toc-list"></ul>
+  </nav>
+
   <button id="back-to-top" class="icon-btn" type="button" role="button" aria-label="返回頂部">⬆︎ 返回頂部</button>
 
-  <!-- 內嵌的 Markdown 後備內容（若無法 fetch 本地檔案時使用） -->
-  <script type="text/markdown" id="md-fallback">
-# Agent
-
-What are agents?
-
-- An **agent** is anything that can be viewed as perceiving its **environment** through **sensors** and acting upon that environment through **actuators.**
-  - Humans as agent
-    - sensors → eyes, ears, …
-    - actuators → hands, legs, mouth, …
-  - Robotic agents
-    - sensors → cameras, microphone, infrared range finders
-    - actuators → various tools, motors, propulsion system
-
-The concept of precept
-
-- Percept → refers to the agent’s perceptual inputs at any given instant.
-- Percept sequence → An agent’s percept sequence is the complete history of everything the agent has ever perceived.
-- Agents’s behaviour → is described by the **agent function** that maps any given percept sequence to an action: $[f:P^* → A]$
-  - What is purpose of the agent function? → The agent function maps from percept histories to actions.
-  - The **agent program** runs on the physical architecture (environment) to produce $f$
-
----
-
-# Rational Agents
-
-The differences between agent and rational agent:
-
-- An agent is an entity that perceives and acts.
-- A rational agent selects actions that maximise its (expected) utility.
-
-What criteria does a rational agent use to ensure its actions are rational?
-
-- Characteristics of the **percepts**, **environment**, and **action space** dictate techniques for selecting rational actions.
-- The right action is the one that will cause the agent to be most successful.
-
-How should we measure the performance of an agent's behavior?
-
-- An objective criterion for the success of an agent’s behaviour(actions) → we should design performance measures according to what actually wants in the environment.
-- The standards for measuring performance can be viewed from multiple perspectives
-  - For example: The performance measures of a vacuum-cleaner agent:
-    - The amount of dirt cleaned up
-    - The amount of time taken
-    - The amount of electricity consumed
-    - The amount of noise generated
-
-Rationality and omniscience
-
-- An omniscient agent knows the actual outcome of its actions and can act accordingly; but omniscience is impossible in reality.
-- Rationality is not the same as perfection.
-
-Agents can progress through learning (Autonomous Agents)
-
-- Agents can perform actions in order to modify future percepts to obtain useful information (information gathering, exploration).
-- An agent is autonomous if its behaviour is determined by its own experience (with the ability to learn and adapt).
-
----
-
-# PEAS
-
-In designing an agent, the first step must always be to specify PEAS as fully as possible
-
-- Performance measure → The specific measurement criteria of the goals you hope the agent can achieve.
-- Environment → In what environment does the agent work?
-- Actuators → What actions can an agent take?
-- Sensors → Components that enable agents to perceive the environment.
-
----
-
-# Environment Types
-
-Fully observable vs Partially observable
-
-- Fully observable → The sensors of the agent can obtain complete information and status of the environment at any time.
-- Partially observable → The sensors of the agent can only obtain limited information and status at a certain point in time.
-
-Deterministic vs Nondeterministic vs Strategic
-
-- Deterministic → The next state of the environment is entirely determined by the current state and the actions performed by the agent.
-- Nondeterministic → The next state of the environment is only partially determined by the current state and the actions performed by the agent.
-- Strategic → The next state of the environment depends only on the actions of other agents, not random events.
-
-Static vs Dynamic
-
-- Static → The environment will not change during the agent's consideration period.
-- Semi-dynamic → The environment itself remains unchanged over time, but the performance score of the agent will change.
-- Dynamic → The environment will change during the agent's consideration period.
-
-Single agent vs multi-agent
-
-- Single agent → The agent operates **alone**; only its own actions affect the environment.
-- Multi-agent → There are multiple agents, each able to act and influence the environment and each other.
-
-Episodic vs Sequential
-
-- Episodic → Each perception-action pair is independent.
-- Sequential → Actions depend on past percepts and affect future ones.
-
-Discrete vs Continuous
-
-- Discrete → Finite, countable states and actions.
-- Continuous → Infinite, real-valued states and actions.
-
----
-
-# Types of Agents
-
-How can theoretical intelligent agents be implemented in practice?
-
-- The behavior of an intelligent agent is entirely determined by its **agent function**, which maps every possible sequence of perceptions to an appropriate action.
-- In theory, we could implement this function by using a huge lookup table that records every possible sequence of percepts and its corresponding action. Such an agent is called a **Table-lookup agent**.
-- However, this is difficult to achieve because:
-  - It requires constructing a table that covers **all possible percept sequences**.
-  - The table would be **enormous** and take an extremely long time to build.
-  - The agent would **lack autonomy** — it cannot learn or adapt on its own.
-- Therefore, we aim to produce **rational behavior** from a **compact, intelligent program**, rather than from a vast lookup table.
-
-Four more efficient and intelligent practical models were produced to solve this problem
-
-1. **Simple reflex agents** → select actions based only on the current percept, ignoring the history of previous percepts.
-
-   - Does an agent decide what to do only based on "what is seen at the moment”.
-   - It does not remember the past nor reason about the future.
-   - The behavior is completely of the "immediate response" type.
-   - The operation process of the model: **Precept → Rule match → Action**
-   - It can only work effectively in a fully observable static environment because it cannot take action when the rule matching fails (without the corresponding perception-behavior).
-
-2. **Model-based reflex agents** → keeps track of the part of the world it can’t currently see by maintaining an internal state that depends on percept history and a model describing how the world evolves and how the agent’s actions affect it.
-
-   - Unlike simple reflective agents that can only rely on "current perception", model-based agents "remember" previous information and "infer" the current state of the world.
-   - It has an internal state, which helps it understand those parts of the world that are "currently invisible but may exist".
-   - The operation process of the model: **Precept → Update State (previous state, previous action, current percept, model) → Rule Match → Action**
-   - It can work under partially observable conditions by using the internal state and model to update the understanding of the world and then select actions according to the rules.
-
-3. **Goal-based agents** → act not only on the current state of the environment but also based on a goal — a desired situation or outcome they want to achieve.
-
-   - Model-based agents only know "how the world is now", while Goal-based agents know "how I want the world to become".
-   - It will choose actions that can achieve the goal rather than just passively react.
-   - The operation process of the model: **Precept → Update State (previous state, previous action, current percept, model) → Goal (desired state) → Search / Planning (decide which action leads to goal) → Choose Action → Execute**
-
-4. **Utility-based agents** → choose actions not only to achieve goals, but also to maximize their happiness or preference, as measured by a utility function.
-   - Goal-based agents only care about "whether the Goal has been achieved" (success or failure), while Utility-based agents not only care about "whether it has been achieved", but also measure "whether it has been achieved well".
-   - It uses an indicator called a **utility function** to compare the "satisfaction level" of different world states.
-   - The operation process of the model: **Precept → Update State (previous state, previous action, current percept, model) → Goal (desired state) → Search / Planning (decide which action leads to goal) → Evaluate Utility [Utility Function] (based on predicted states) → Choose Action [Decision Function] (that maximizes expected Utility) → Execute**
-  </script>
+  <!--（已移除動態 Markdown 內容，改用重組後的靜態教學內容）-->
 
   <script>
-    // 功能：根據使用者偏好初始化主題（深色/淺色），並設定切換邏輯
+    /**
+     * 功能：根據使用者偏好初始化主題（深色/淺色），並設定切換邏輯
+     * - 儲存於 localStorage，並同步按鈕 ARIA 狀態
+     */
     function initTheme() {
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       const saved = localStorage.getItem('theme');
@@ -430,59 +352,29 @@ Four more efficient and intelligent practical models were produced to solve this
         html.classList.toggle('theme-dark', mode === 'dark');
         html.dataset.theme = mode;
         localStorage.setItem('theme', mode);
-        // 同步按鈕 ARIA 狀態
         const btn = document.getElementById('theme-toggle');
-        btn.setAttribute('aria-pressed', mode === 'dark' ? 'true' : 'false');
+        if (btn) btn.setAttribute('aria-pressed', mode === 'dark' ? 'true' : 'false');
       };
       applyTheme(saved || (prefersDark ? 'dark' : 'light'));
-
-      document.getElementById('theme-toggle').addEventListener('click', () => {
-        const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
-        applyTheme(next);
-      });
-    }
-
-    // 功能：載入 lecture02.md；若失敗，回退到內嵌的 md-fallback
-    async function loadMarkdown() {
-      try {
-        const resp = await fetch('lecture02.md', { cache: 'no-store' });
-        if (!resp.ok) throw new Error('failed to fetch md');
-        return await resp.text();
-      } catch (err) {
-        const fallback = document.getElementById('md-fallback');
-        return fallback ? fallback.textContent : '# 載入失敗';
+      const btn = document.getElementById('theme-toggle');
+      if (btn) {
+        const toggle = () => applyTheme(html.dataset.theme === 'dark' ? 'light' : 'dark');
+        btn.addEventListener('click', toggle);
+        btn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
       }
     }
 
-    // 功能：將 Markdown 字串轉成 HTML 並插入頁面
-    async function renderMarkdown(md) {
-      // marked 設定：啟用 GFM 與換行
-      marked.setOptions({
-        gfm: true,
-        breaks: false
-      });
-      const html = marked.parse(md);
-      const $content = document.getElementById('content');
-      $content.innerHTML = html;
+    //（已移除 Markdown 解析：改以靜態教學內容直接在 HTML 中提供）
 
-      addAnchors();
-      buildTOC();
-      applySyntaxHighlighting();
-
-      // MathJax 公式渲染
-      if (window.MathJax && window.MathJax.typesetPromise) {
-        await window.MathJax.typesetPromise();
-      }
-    }
-
-    // 功能：為所有標題新增錨點 id 與可點擊的鏈接圖示
+    /**
+     * 功能：為所有標題新增錨點 id 與可點擊的鏈接圖示
+     */
     function addAnchors() {
       const headings = document.querySelectorAll('#content h1, #content h2, #content h3, #content h4, #content h5, #content h6');
       headings.forEach(h => {
         const text = h.textContent.trim();
         const id = slugify(text);
         h.id = id;
-        // 插入章節錨點鏈接
         const a = document.createElement('a');
         a.href = `#${id}`;
         a.className = 'anchor-link';
@@ -492,13 +384,14 @@ Four more efficient and intelligent practical models were produced to solve this
       });
     }
 
-    // 功能：建立層級分明的目錄，對應 h1~h6
+    /**
+     * 功能：建立層級分明的目錄，對應 h1~h6，支援點擊跳轉與目前章節高亮
+     */
     function buildTOC() {
       const headings = Array.from(document.querySelectorAll('#content h1, #content h2, #content h3, #content h4, #content h5, #content h6'));
       const $list = document.getElementById('toc-list');
       $list.innerHTML = '';
       const stack = [{ level: 0, ul: $list }];
-
       headings.forEach(h => {
         const level = parseInt(h.tagName.substring(1), 10);
         const li = document.createElement('li');
@@ -506,102 +399,73 @@ Four more efficient and intelligent practical models were produced to solve this
         a.href = `#${h.id}`;
         a.textContent = h.textContent.replace('🔗', '').trim();
         a.addEventListener('click', () => {
-          // 更新目前章節樣式
           document.querySelectorAll('#toc a').forEach(x => x.classList.remove('current'));
           a.classList.add('current');
         });
         li.appendChild(a);
-
-        // 根據標題層級建立巢狀清單
         while (stack[stack.length - 1].level >= level) stack.pop();
         const parent = stack[stack.length - 1].ul;
         parent.appendChild(li);
-
         const ul = document.createElement('ul');
         li.appendChild(ul);
         stack.push({ level, ul });
       });
     }
 
-    // 功能：產生 URL 友善的 slug id
+    /**
+     * 功能：產生 URL 友善 slug id（保留中文、英數與連字號）
+     */
     function slugify(text) {
-      return text
-        .toLowerCase()
-        .replace(/[\s]+/g, '-')
-        .replace(/[^\w\-一-龥]/g, '-') // 保留中文、英數與連字號
-        .replace(/\-+/g, '-')
-        .replace(/^\-+|\-+$/g, '');
+      return text.toLowerCase().replace(/[\s]+/g, '-').replace(/[^\w\-一-龥]/g, '-').replace(/\-+/g, '-').replace(/^\-+|\-+$/g, '');
     }
 
-    // 功能：套用語法高亮到所有程式碼區塊
+    /**
+     * 功能：套用語法高亮到所有程式碼區塊
+     */
     function applySyntaxHighlighting() {
-      if (window.hljs && hljs.highlightAll) {
-        hljs.highlightAll();
-      }
+      if (window.hljs && hljs.highlightAll) { hljs.highlightAll(); }
     }
 
-    // 功能：初始化「返回頂部」按鈕行為與顯示
+    /**
+     * 功能：初始化「返回頂部」按鈕行為與顯示
+     */
     function initBackToTop() {
       const btn = document.getElementById('back-to-top');
-      const toggle = () => {
-        const show = window.scrollY > 600;
-        btn.classList.toggle('show', show);
-      };
+      const toggle = () => { const show = window.scrollY > 600; btn.classList.toggle('show', show); };
       toggle();
       window.addEventListener('scroll', toggle);
-      btn.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
+      const scrollTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+      btn.addEventListener('click', scrollTop);
+      btn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); scrollTop(); } });
     }
 
-    // 功能：初始化目錄的顯示/隱藏切換（行動端友善）
+    /**
+     * 功能：初始化目錄顯示/隱藏（固定右側，具過渡動畫），支援鍵盤切換
+     * - 切換 aria-expanded
+     * - 透過 .is-open class 控制顯示與動畫
+     */
     function initTOCToggle() {
       const btn = document.getElementById('toc-toggle');
       const toc = document.getElementById('toc');
-      const update = (expanded) => {
-        btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-        toc.style.display = expanded ? '' : 'none';
-      };
-      btn.addEventListener('click', () => {
-        const expanded = btn.getAttribute('aria-expanded') !== 'true';
-        update(expanded);
+      const apply = (expanded) => { btn.setAttribute('aria-expanded', expanded ? 'true' : 'false'); toc.classList.toggle('is-open', expanded); };
+      const toggle = () => apply(btn.getAttribute('aria-expanded') !== 'true');
+      btn.addEventListener('click', toggle);
+      btn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+      apply(false); // 預設關閉：主內容全寬顯示
+    }
+
+    /**
+     * 功能：初始化頁面（不再載入 Markdown），生成錨點與目錄並渲染公式與語法高亮
+     */
+    /**
+     * 功能：使用抽離框架初始化頁面（錨點、目錄、語法高亮、公式渲染、返回頂部、主題）。
+     */
+    </script>
+    <script src="/deployed/assets/js/framework.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        UI.initPage();
       });
-      // 預設顯示
-      update(true);
-    }
-
-    // 功能：主流程—初始化頁面並渲染 Markdown 為 HTML
-    async function main() {
-      initTheme();
-      initBackToTop();
-      initTOCToggle();
-      const md = await loadMarkdown();
-      await renderMarkdown(md);
-    }
-
-    // 啟動
-    document.addEventListener('DOMContentLoaded', main);
-  </script>
-
-  <style>
-    /* 無障礙：隱藏但可由鍵盤聚焦的「跳至內容」 */
-    .visually-hidden {
-      position: absolute;
-      left: -9999px;
-      top: auto;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-    }
-    .visually-hidden:focus {
-      position: static;
-      width: auto;
-      height: auto;
-      padding: .5rem;
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-    }
-  </style>
-</body>
+    </script>
+  </body>
 </html>

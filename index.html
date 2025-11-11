@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>COMPS333F — 課程導覽</title>
+    <meta name="description" content="COMPS333F 課程文件根目錄與導航首頁" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+    <link rel="stylesheet" href="/deployed/assets/css/framework.css" />
+  </head>
+  <body>
+    <header class="site-header" role="banner">
+      <div class="header-inner">
+        <div class="brand">
+          <a href="/deployed/index.html" class="brand-link" aria-label="返回首頁">COMPS333F</a>
+          <span class="brand-sub">文件導航</span>
+        </div>
+        <div class="actions">
+          <button id="theme-toggle" class="btn" aria-label="切換主題" aria-pressed="false">主題</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container" role="main">
+      <section class="hero" aria-label="頁面說明">
+        <h1>課程文件導航</h1>
+        <p>瀏覽各 Lecture 的重構教學頁面與 Markdown 轉換展示。</p>
+        <div class="hero-actions">
+          <input id="search" type="search" placeholder="搜尋標題、描述或標籤…" aria-label="搜尋課程" />
+        </div>
+      </section>
+
+      <section aria-label="課程列表">
+        <div id="lecture-list" aria-live="polite">
+          <p>正在載入課程列表…</p>
+        </div>
+      </section>
+    </main>
+
+    <button id="back-to-top" aria-label="返回頂部">▲</button>
+
+    <script src="/deployed/assets/js/framework.js"></script>
+    <script src="/deployed/assets/js/home.js"></script>
+  </body>
+</html>
